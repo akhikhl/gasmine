@@ -1,0 +1,25 @@
+buildscript {
+
+  repositories {
+    mavenLocal()
+    mavenCentral()
+  }
+
+  apply plugin: "maven"
+  
+  dependencies {
+    classpath "org.akhikhl:gasmine:0.0.1"
+  }
+}
+
+repositories {
+  mavenLocal()
+  mavenCentral()
+}
+
+apply plugin: "maven"
+apply plugin: "java"
+apply plugin: "gasmine"
+
+version = '0.0.1'
+
