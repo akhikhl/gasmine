@@ -8,7 +8,7 @@ buildscript {
   apply plugin: "maven"
   
   dependencies {
-    classpath "org.akhikhl:gasmine:0.0.1"
+    classpath "org.akhikhl.gasmine:gasmine-plugin:0.0.1"
   }
 }
 

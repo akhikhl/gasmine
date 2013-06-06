@@ -1,14 +1,19 @@
-__load("gasmine/commons.js");
-__load("jasmine/jasmine.js");
-__load("gasmine/consoleBoot.js");
-__load("gasmine/consoleReporter.js");
+(function(global) {
+  global.window = {};
+})(this);
+
+load("jasmine/jasmine.js");
+load("gasmine/consoleBoot.js");
+load("gasmine/consoleReporter.js");
 
 (function(global) {
   
   let FileFilter = java.io.FileFilter;
   let FilenameUtils = org.apache.commons.io.FilenameUtils;
   
-  return function(scriptDirectory, logger) {
+  return function(args) {
+  
+    let scriptDirectory = args[0];
   
     function loadTestScripts_(folder) {
       let subFolders = folder.listFiles(FileFilter({ accept: function(f) { return f.isDirectory(); } }));
@@ -25,7 +30,7 @@ __load("gasmine/consoleReporter.js");
       if(files != null)
         for each(let f in files) {
           logger.trace("Loading test script: {}", f.getName());
-          __load(f);
+          load(f);
         }
     }
     
