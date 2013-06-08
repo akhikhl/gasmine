@@ -4,6 +4,6 @@ apply plugin: "groovy"
 dependencies {
   compile "org.codehaus.groovy:groovy-all:1.8.6"
   compile gradleApi()
-  compile "org.akhikhl.ghino:ghino-runner:0.0.1"
+  compile "org.akhikhl.gino:gino-runner:0.0.1"
 }
 
