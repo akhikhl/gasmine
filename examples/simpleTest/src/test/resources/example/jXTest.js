@@ -25,22 +25,40 @@ describe("jX monad", function() {
   });
 });
 
-// jX.fn.reverse is of no practical use; here we just test transform itself.
+// jX.fn.reverse is not very useful; here we just test walk feature.
 describe("jX reverse", function() {
 
   beforeEach(function() {
     if(!jX.fn.reverse)
       jX.fn.reverse = function() {
-        return this.transform({
-          transformArray: function(arr) {
-            return arr.reverse();
-          },
-          transformString: function(s) {
+        return this.walk(new function() {
+          let containerStack = [];
+          this.beforeArray = function() {
+            containerStack.push([]);
+          };
+          this.beforeObject = function() {
+            containerStack.push({});
+          };
+          this.gotArray = function() {
+            let result = containerStack.pop();
+            result.reverse();
+            return result;
+          };
+          this.gotObject = function() {
+            return containerStack.pop();
+          };
+          this.gotArrayElement = function(arr, i, elem) {
+            containerStack[containerStack.length - 1].push(elem);
+          };
+          this.gotMapElement = function(arr, key, i, val) {
+            containerStack[containerStack.length - 1][key] = val;
+          };
+          this.gotString = function(s) {
             var o = '';
             for (var i = s.length - 1; i >= 0; i--)
               o += s[i];
-            return o;        
-          }
+            return o;
+          };
         });
       };
   });
@@ -126,129 +144,6 @@ describe("jX toJS", function() {
 
 describe("jX toJSON", function() {
 
-  beforeEach(function() {
-    if(!jX.fn.toJSON)
-      jX.fn.toJSON = function() {
-      
-        let walker = new function() {
-          
-          let buffer = new java.lang.StringBuilder();
-          let elemCountStack = [];
-          
-          function appendQuoted(s) {
-            buffer.append("\"");
-            for(let i = 0; i < s.length; i++) {
-              let c = s.charAt(i);
-              if(c == "\"" || c == "\\")
-                buffer.append("\\");
-              buffer.append(c);
-            }
-            buffer.append("\"");
-          }
-          
-          this.enterArray = this.enterJavaArray = this.enterJavaCollection = function() {
-            buffer.append("[");
-            elemCountStack.push(0);
-          };
-          
-          this.enterObject = this.enterJavaMap = function() {
-            buffer.append("{");
-            elemCountStack.push(0);
-          };
-          
-          this.exitArray = this.exitJavaArray = this.exitJavaCollection = function() {
-            if(elemCountStack[elemCountStack.length - 1] != 0)
-              buffer.append(" ");
-            buffer.append("]");
-            elemCountStack.pop();
-          };
-          
-          this.exitObject = this.exitJavaMap = function() {
-            if(elemCountStack[elemCountStack.length - 1] != 0)
-              buffer.append(" ");
-            buffer.append("}");
-            elemCountStack.pop();
-          };
-          
-          this.gotArrayElement = function(obj, i, elem) {
-            if(elemCountStack[elemCountStack.length - 1] != 0)
-              buffer.append(",");
-            buffer.append(" ");
-            ++(elemCountStack[elemCountStack.length - 1]);
-          };
-          
-          this.gotBoolean = function(b) {
-            buffer.append(b ? "true" : "false");
-          };
-          
-          this.gotJavaBoolean = function(b) {
-            buffer.append(b == java.lang.Boolean.TRUE ? "true" : "false");
-          };
-          
-          this.gotJavaChar = function(c) {
-            this.gotString(String(java.lang.String.valueOf(c)));
-          };
-          
-          this.gotJavaNumber = function(n) {
-            n = Number(n);
-            buffer.append(n % 1 == 0 ? n.toFixed() : n);
-          };
-          
-          this.gotJavaString = function(s) {
-            appendQuoted(String(s));
-          };
-          
-          this.gotMapElement = function(obj, key, elem) {
-            if(elemCountStack[elemCountStack.length - 1] != 0)
-              buffer.append(",");
-            buffer.append(" ");
-            ++(elemCountStack[elemCountStack.length - 1]);
-            key = String(key);
-            let validIdent = false;
-            if(key.length != 0 && java.lang.Character.isJavaIdentifierStart(key[0])) {
-              validIdent = true;
-              for (let i = 1; i < key.length; i++)
-                 if(!java.lang.Character.isJavaIdentifierPart(key[i])) {
-                   validIdent = false;
-                   break;
-                 }
-            }
-            if(validIdent)
-              buffer.append(key);
-            else
-              appendQuoted(key)
-            buffer.append(": ");
-          };
-          
-          this.gotNull = function() {
-            buffer.append("null");
-          };
-          
-          this.gotNumber = function(n) {
-            buffer.append(n % 1 == 0 ? n.toFixed() : n);
-          };
-          
-          this.gotOther = function(x) {
-            buffer.append(String(x));
-          };
-          
-          this.gotString = function(s) {
-            appendQuoted(s);
-          };
-          
-          this.gotUndefined = function() {
-            buffer.append("undefined");
-          };
-          
-          this.result = function() {
-            return String(buffer.toString());
-          };
-        };
-        
-        return this.walk(walker);
-      };
-  });
-  
   it("should convert null to JSON", function() {
     expect(jX(null).toJSON().get()).toEqual("null");
   });
@@ -312,6 +207,10 @@ describe("jX toJSON", function() {
   it("should convert JS-object with non-ident-keys to JSON", function() {
     expect(jX({ type: "apple", "color-value": "red" }).toJSON().get()).toEqual("{ type: \"apple\", \"color-value\": \"red\" }");
   });
+  it("should convert complex JS-object to JSON", function() {
+    expect(jX({ type: "apple", color: "red", sizes: [ "big", "small" ] }).toJSON().get())
+      .toEqual("{ type: \"apple\", color: \"red\", sizes: [ \"big\", \"small\" ] }");
+  });
   it("should convert Java-Map to JSON", function() {
     let map = new java.util.LinkedHashMap();
     map.put("type", "apple");
@@ -333,5 +232,9 @@ describe("jX toJSON", function() {
   });
   it("should convert undefined within JS-object to JSON", function() {
     expect(jX({ type: "apple", color: undefined }).toJSON().get()).toEqual("{ type: \"apple\" }");
+  });
+  it("should convert complex JS-object with exclusions to JSON", function() {
+    expect(jX({ type: "apple", color: "red", sizes: [ "big", "small" ] }).toJSON({ excludeKeys: [ "sizes" ] }).get())
+      .toEqual("{ type: \"apple\", color: \"red\" }");
   });
 });
