@@ -237,4 +237,7 @@ describe("jX toJSONString", function() {
     expect(jX({ type: "apple", color: "red", sizes: [ "big", "small" ] }).toJSONString({ excludeKeys: [ "sizes" ] }).get())
       .toEqual("{ type: \"apple\", color: \"red\" }");
   });
+  it("should convert function to JSON", function() {
+    expect(jX(function(x, y) { return x + y; }).toJSONString().get()).toEqual("\nfunction (x, y) {\n    return x + y;\n}\n");
+  });
 });
