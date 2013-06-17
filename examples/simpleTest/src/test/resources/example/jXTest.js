@@ -238,10 +238,3 @@ describe("jX toJSON", function() {
       .toEqual("{ type: \"apple\", color: \"red\" }");
   });
 });
-
-/*describe("jX toXML", function() {
-
-  it("should convert null to XML", function() {
-    expect(jX(null).toXMLString().get()).toEqual("<null/>");
-  });
-});*/
