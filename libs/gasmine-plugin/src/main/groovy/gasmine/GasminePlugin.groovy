@@ -26,7 +26,7 @@ class GasminePlugin implements Plugin<Project> {
         urls += project.configurations["runtime"].collect { dep -> dep.toURI().toURL() }
         URLClassLoader classLoader = new URLClassLoader(urls as URL[], GasminePlugin.class.classLoader)
 
-        def result = gino.Runner.run("gasmine/testRunner.js", [scriptDirectory ] as Object[], classLoader, logger)
+        def result = gino.Runner.run("gasmine/testRunner.js", [scriptDirectory ] as Object[], classLoader, logger, true, project.projectDir.absolutePath)
 
         if(result != 0)
         // assuming that test reporting tool already explained the reason of failure.
