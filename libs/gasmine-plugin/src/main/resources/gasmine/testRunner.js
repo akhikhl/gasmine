@@ -25,16 +25,27 @@ importClass(org.apache.commons.io.FilenameUtils);
       }
   }
   
-  return function(args) {
-    Packages.gasmine.Functions.defineFunctions(global);
-    let env = global.jasmine.getEnv();
-    let reporter = new global.ConsoleReporter(logger);  
-    env.addReporter(reporter);
-    loadTestScripts(args[0]);
-    env.execute();
-    while(!reporter.getCompleted())
-      java.lang.Thread.sleep(100);
-    global.clearAllTimeouts();
-    return reporter.getFailCount();
+  return new function() {
+    
+    let env, reporter;
+    
+    this.beforeMain = function(args) {
+      Packages.gasmine.Functions.defineFunctions(global);
+      env = global.jasmine.getEnv();
+      reporter = new global.ConsoleReporter(logger);  
+      env.addReporter(reporter);
+      loadTestScripts(args[0]);
+    };
+    
+    this.main = function(args) {
+      try {
+        env.execute();
+        while(!reporter.getCompleted())
+          java.lang.Thread.sleep(100);
+      } finally {
+        global.clearAllTimeouts();
+      }
+      return reporter.getFailCount();
+    };
   };
 })(this);
