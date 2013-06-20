@@ -1,8 +1,9 @@
 package gasmine
 
+import gino.Runner
+
 import org.mozilla.javascript.Context
 import org.mozilla.javascript.Function
-import org.mozilla.javascript.NativeJavaObject
 import org.mozilla.javascript.Scriptable
 import org.mozilla.javascript.ScriptableObject
 import org.slf4j.Logger
@@ -17,18 +18,25 @@ public final class Functions {
 
   private static class DelegatedTimerTask extends java.util.TimerTask {
 
-    Runnable runnable
-    ClassLoader classLoader
+    private final ClassLoader classLoader
+    private final Scriptable scope
+    private final Function function
 
-    DelegatedTimerTask(Runnable runnable, ClassLoader classLoader) {
-      this.runnable = runnable
+    DelegatedTimerTask(ClassLoader classLoader, Scriptable scope, Function function) {
       this.classLoader = classLoader
+      this.scope = scope
+      this.function = function
     }
 
     @Override
     public void run() {
       Thread.currentThread().setContextClassLoader(classLoader)
-      runnable.run()
+      Context cx = Runner.enterContext(classLoader)
+      try {
+        function.call cx, scope, scope, [] as Object[]
+      } finally {
+        Runner.exitContext()
+      }
     }
   }
 
@@ -43,7 +51,7 @@ public final class Functions {
       logInvalidArgs("createTimerTask")
       return Context.getUndefinedValue()
     }
-    return Context.toObject(new DelegatedTimerTask((Runnable) ((NativeJavaObject) args[0]).unwrap()), thisObj)
+    return Context.toObject(new DelegatedTimerTask(cx.getApplicationClassLoader(), thisObj, args[0]), thisObj)
   }
 
   private static void logInvalidArgs(String functionName) {

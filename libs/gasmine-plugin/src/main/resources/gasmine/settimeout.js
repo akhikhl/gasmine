@@ -5,9 +5,9 @@
     var counter = 1; 
     var ids = {};
 
-    global.setTimeout = function (fn,delay) {
+    global.setTimeout = function (fn, delay) {
       var id = counter++;
-      ids[id] = createTimerTask(new java.lang.Runnable({ run: function() { fn(); } }));
+      ids[id] = createTimerTask(fn);
       timer.schedule(ids[id], delay);
       return id;
     };
@@ -18,10 +18,10 @@
       delete ids[id];
     };
 
-    global.setInterval = function (fn,delay) {
+    global.setInterval = function (fn, delay) {
       var id = counter++; 
-      ids[id] = createTimerTask(new java.lang.Runnable({ run: function() { fn(); } }));
-      timer.schedule(ids[id],delay,delay);
+      ids[id] = createTimerTask(fn);
+      timer.schedule(ids[id], delay, delay);
       return id;
     };
 
