@@ -18,13 +18,16 @@ public final class Functions {
   private static class DelegatedTimerTask extends java.util.TimerTask {
 
     Runnable runnable
+    ClassLoader classLoader
 
-    DelegatedTimerTask(Runnable runnable) {
+    DelegatedTimerTask(Runnable runnable, ClassLoader classLoader) {
       this.runnable = runnable
+      this.classLoader = classLoader
     }
 
     @Override
     public void run() {
+      Thread.currentThread().setContextClassLoader(classLoader)
       runnable.run()
     }
   }

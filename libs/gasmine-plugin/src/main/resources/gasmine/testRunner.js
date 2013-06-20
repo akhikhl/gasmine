@@ -29,7 +29,7 @@ importClass(org.apache.commons.io.FilenameUtils);
     
     let env, reporter;
     
-    this.beforeMain = function(args) {
+    this.beforeMain = function(args) {      
       Packages.gasmine.Functions.defineFunctions(global);
       env = global.jasmine.getEnv();
       reporter = new global.ConsoleReporter(logger);  
