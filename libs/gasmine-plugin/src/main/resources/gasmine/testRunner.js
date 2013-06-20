@@ -1,21 +1,16 @@
-(function(global) {
-  global.window = {};
-})(this);
-
+load("gasmine/settimeout.js");
 load("jasmine/jasmine.js");
-load("gasmine/consoleBoot.js");
 load("gasmine/consoleReporter.js");
+importClass(java.io.FileFilter);
+importClass(org.apache.commons.io.FilenameUtils);
 
 (function(global) {
   
-  let FileFilter = java.io.FileFilter;
-  let FilenameUtils = org.apache.commons.io.FilenameUtils;
-  
-  function loadTestScripts_(folder) {
+  function loadTestScripts(folder) {
     let subFolders = folder.listFiles(FileFilter({ accept: function(f) { return f.isDirectory(); } }));
     if(subFolders != null)
       for each(let subFolder in subFolders)
-        loadTestScripts_(subFolder);
+        loadTestScripts(subFolder);
     let files = folder.listFiles(FileFilter({ accept: function(f) { 
       if(!f.isFile())
         return false;
@@ -30,20 +25,16 @@ load("gasmine/consoleReporter.js");
       }
   }
   
-  return {
-    beforeMain: function(args) {
-      loadTestScripts_(args[0]);
-    },
-    main: function(args) {
-      let env = global.jasmine.getEnv();
-      let reporter = new global.ConsoleReporter(logger);  
-      env.addReporter(reporter);
-      env.execute();
-      if(reporter.failCount() == 0)
-        logger.warn("RESULTS: {} passed.", Number(reporter.passedCount()).toFixed(0));
-      else
-        logger.error("RESULTS: {} passed, {} FAILED.", Number(reporter.passedCount()).toFixed(0), Number(reporter.failCount()).toFixed(0));
-      return reporter.failCount();
-    }
+  return function(args) {
+    Packages.gasmine.Functions.defineFunctions(global);
+    let env = global.jasmine.getEnv();
+    let reporter = new global.ConsoleReporter(logger);  
+    env.addReporter(reporter);
+    loadTestScripts(args[0]);
+    env.execute();
+    while(!reporter.getCompleted())
+      java.lang.Thread.sleep(100);
+    global.clearAllTimeouts();
+    return reporter.getFailCount();
   };
 })(this);
