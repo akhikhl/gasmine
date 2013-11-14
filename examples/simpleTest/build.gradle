@@ -5,10 +5,10 @@ buildscript {
     mavenCentral()
   }
 
-  apply plugin: "maven"
+  apply plugin: 'maven'
   
   dependencies {
-    classpath "org.akhikhl.gasmine:gasmine-plugin:0.0.1"
+    classpath 'org.akhikhl.gasmine:gasmine-plugin:0.0.2'
   }
 }
 
@@ -17,9 +17,9 @@ repositories {
   mavenCentral()
 }
 
-apply plugin: "maven"
-apply plugin: "java"
-apply plugin: "gasmine"
+apply plugin: 'maven'
+apply plugin: 'java'
+apply plugin: 'gasmine'
 
-version = '0.0.1'
+version = '0.0.2'
 
