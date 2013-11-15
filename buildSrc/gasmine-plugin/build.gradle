@@ -1,8 +1,8 @@
 apply plugin: 'groovy'
 
 dependencies {
-  compile 'org.codehaus.groovy:groovy-all:2.1.9'
-  compile gradleApi()
   compile 'org.akhikhl.gino:gino-runner:0.0.2'
+  compile "org.codehaus.groovy:groovy-all:$groovy_version"
+  compile gradleApi()
 }
 

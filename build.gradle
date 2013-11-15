@@ -1,0 +1,23 @@
+buildscript {
+  apply plugin: 'maven'
+  
+  repositories {
+    mavenLocal()
+    mavenCentral()
+  }
+
+  dependencies {
+    classpath 'org.akhikhl.gino:gino-plugin:0.0.2'
+    classpath 'org.akhikhl.gasmine:gasmine-plugin:0.0.2'
+  }
+}
+
+ext {
+  group = 'org.akhikhl.gasmine'
+  version = '0.0.2'
+  generateSources = false
+  generateJavadoc = false
+}
+
+apply from: file('root.gradle')
+
