@@ -7,14 +7,14 @@ buildscript {
   }
 
   dependencies {
-    classpath 'org.akhikhl.gino:gino-plugin:0.0.2'
-    classpath 'org.akhikhl.gasmine:gasmine-plugin:0.0.2'
+    classpath 'org.akhikhl.gino:gino-plugin:0.0.3'
+    classpath 'org.akhikhl.gasmine:gasmine-plugin:0.0.3'
   }
 }
 
 ext {
   group = 'org.akhikhl.gasmine'
-  version = '0.0.2'
+  version = '0.0.3'
   generateSources = false
   generateJavadoc = false
 }
