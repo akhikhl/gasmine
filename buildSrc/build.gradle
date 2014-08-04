@@ -1,19 +1,13 @@
 apply plugin: 'base' // add "clean" task to the root project.
 
-ext {
-  groovy_version = '2.3.2'
-}
-
 subprojects {
   apply plugin: 'maven'
 
   repositories {
     mavenLocal()
+    jcenter()
     mavenCentral()
   }
-
-  group = 'org.akhikhl.gasmine'
-  version = '0.0.3'
 
   afterEvaluate {  
     build {
