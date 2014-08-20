@@ -1,4 +1,5 @@
 apply plugin: 'groovy'
+apply from: rootProject.file('common.gradle')
 
 dependencies {
   compile "org.akhikhl.gino:gino-runner:$gino_version"

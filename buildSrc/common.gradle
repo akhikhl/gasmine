@@ -42,5 +42,39 @@ afterEvaluate {
       // apps and examples should not be uploaded to maven repository
       project.tasks.uploadArchives.enabled = false
     }
+
+    task('createFolders', description: 'Creates the source folders if they do not exist.') << {
+      sourceSets*.allSource*.srcDirs*.each { File srcDir ->
+        if (!srcDir.isDirectory()) {
+          println "Creating source folder: ${srcDir}"
+          srcDir.mkdirs()
+        }
+      }
+    }
+
+    if(tasks.findByName('classes')) {
+      task sourcesJar(type: Jar, dependsOn: classes, description: 'Creates sources jar') {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+      }
+      artifacts {
+        archives sourcesJar
+      }
+    }
+
+    if(tasks.findByName('javadoc')) {
+      task javadocJar(type: Jar, description: 'Creates javadoc jar') {
+        dependsOn javadoc
+        classifier = 'javadoc'
+        from javadoc.destinationDir
+        if(tasks.findByName('groovydoc')) {
+          dependsOn groovydoc
+          from groovydoc.destinationDir
+        }
+      }
+      artifacts {
+        archives javadocJar
+      }
+    }
   }
 }
