@@ -1,4 +1,5 @@
 describe("normalizeLines", function() {
+  let lineSep = System.getProperty("line.separator");
   it("should leave null string intact", function() {
     expect(normalizeLines(null)).toBeNull();
   });
@@ -15,9 +16,9 @@ describe("normalizeLines", function() {
     expect(normalizeLines("  \naaa bbb\t  ")).toEqual("aaa bbb");
   });  
   it("should trim leading spaces", function() {
-    expect(normalizeLines("  \naaa   \nbbb\t  ")).toEqual("aaa\nbbb");
+    expect(normalizeLines("  \naaa   \nbbb\t  ")).toEqual("aaa" + lineSep + "bbb");
   });
   it("should skip empty lines", function() {
-    expect(normalizeLines("\n\n  \n\naaa\n   \n   \nbbb\n\n\n")).toEqual("aaa\nbbb");
+    expect(normalizeLines("\n\n  \n\naaa\n   \n   \nbbb\n\n\n")).toEqual("aaa" + lineSep + "bbb");
   });  
 });
