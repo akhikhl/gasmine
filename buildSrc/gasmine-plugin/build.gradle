@@ -2,8 +2,9 @@ apply plugin: 'groovy'
 apply from: rootProject.file('common.gradle')
 
 dependencies {
-  compile "org.akhikhl.gino:gino-runner:$gino_version"
-  compile "org.codehaus.groovy:groovy-all:$groovy_version"
+  compile "org.akhikhl.gino:gino-runner:$gino_version", {
+    exclude group: 'org.codehaus.groovy', module: 'groovy-all'
+  }
   compile gradleApi()
 }
 
